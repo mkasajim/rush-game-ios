@@ -12,6 +12,16 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
 
+    - name: Decode and save .p12 and .mobileprovision files
+      env:
+        P12_FILE_BASE64: ${{ secrets.IOS_P12 }}
+        MOBILEPROVISION_FILE_BASE64: ${{ secrets.IOS_MOBILEPROVISION }}
+        P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+      run: |
+        echo "$P12_FILE_BASE64" | base64 --decode > /tmp/my_cert.p12
+        echo "$MOBILEPROVISION_FILE_BASE64" | base64 --decode > /tmp/my_profile.mobileprovision
+        security import /tmp/my_cert.p12 -k ~/Library/Keychains/login.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+
     - name: Install dependencies
       run: |
         gem install cocoapods
@@ -28,15 +38,7 @@ jobs:
       run: |
         gem install fastlane
 
-    - name: Decode and save .p12 and .mobileprovision files
-      env:
-        P12_FILE_BASE64: ${{ secrets.IOS_P12 }}
-        MOBILEPROVISION_FILE_BASE64: ${{ secrets.IOS_MOBILEPROVISION }}
-        P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
-      run: |
-        echo "$P12_FILE_BASE64" | base64 --decode > /tmp/my_cert.p12
-        echo "$MOBILEPROVISION_FILE_BASE64" | base64 --decode > /tmp/my_profile.mobileprovision
-        security import /tmp/my_cert.p12 -k ~/Library/Keychains/login.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+
 
 
     - name: Build and Sign IPA using Fastlane

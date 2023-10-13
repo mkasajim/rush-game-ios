@@ -1,0 +1,32 @@
+name: Build iOS IPA
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build and Archive iOS app
+    runs-on: macOS-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install CocoaPods
+      run: sudo gem install cocoapods
+
+    - name: Install dependencies using CocoaPods
+      run: pod install --repo-update
+
+    - name: Build IPA
+      run: |
+        xcodebuild archive -workspace Unity-iPhone.xcworkspace -scheme Unity-iPhone -archivePath $PWD/build/Unity-iPhone.xcarchive
+        xcodebuild -exportArchive -archivePath $PWD/build/Unity-iPhone.xcarchive -exportPath $PWD/build/ -exportOptionsPlist ExportOptions.plist
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v2
+      with:
+        name: Unity-iPhone.ipa
+        path: ${{ github.workspace }}/build/Unity-iPhone.ipa

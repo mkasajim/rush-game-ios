@@ -1,4 +1,4 @@
-name: Build iOS IPA with Auto Signing
+name: Build and Sign IOS APP (2)
 
 on:
   workflow_dispatch:

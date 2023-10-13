@@ -16,11 +16,12 @@ jobs:
       env:
         P12_FILE_BASE64: ${{ secrets.IOS_P12 }}
         MOBILEPROVISION_FILE_BASE64: ${{ secrets.IOS_MOBILEPROVISION }}
-        P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+        # P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+        P12_PASSWORD: "pinkpanther"
       run: |
         echo "$P12_FILE_BASE64" | base64 --decode > /tmp/my_cert.p12
         echo "$MOBILEPROVISION_FILE_BASE64" | base64 --decode > /tmp/my_profile.mobileprovision
-        security import /tmp/my_cert.p12 -k ~/Library/Keychains/login.keychain -P "pinkpanther" -T /usr/bin/codesign
+        security import /tmp/my_cert.p12 -k ~/Library/Keychains/login.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
 
     - name: Install dependencies
       run: |

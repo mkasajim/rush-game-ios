@@ -21,6 +21,7 @@ jobs:
       run: |
         echo "$P12_FILE_BASE64" | base64 --decode > /tmp/my_cert.p12
         echo "$MOBILEPROVISION_FILE_BASE64" | base64 --decode > /tmp/my_profile.mobileprovision
+        security unlock-keychain ~/Library/Keychains/login.keychain
         security import /tmp/my_cert.p12 -k ~/Library/Keychains/login.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
 
     - name: Install dependencies

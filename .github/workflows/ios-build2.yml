@@ -1,0 +1,61 @@
+name: Build iOS IPA with Auto Signing
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Archive iOS app
+    runs-on: macOS-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install dependencies
+      run: |
+        gem install cocoapods
+        pod install --repo-update
+
+    # - name: Set up Apple Developer credentials
+    #   env:
+    #     APPLE_ID: ${{ secrets.APPLE_ID }}
+    #     APPLE_PWD: ${{ secrets.APPLE_PWD }}
+    #   run: |
+    #     echo "FASTLANE_USER=${APPLE_ID}" >> $GITHUB_ENV
+    #     echo "FASTLANE_PASSWORD=${APPLE_PWD}" >> $GITHUB_ENV
+    - name: Install Fastlane
+      run: |
+        gem install fastlane
+
+    - name: Decode and save .p12 and .mobileprovision files
+      env:
+        P12_FILE_BASE64: ${{ secrets.IOS_P12 }}
+        MOBILEPROVISION_FILE_BASE64: ${{ secrets.IOS_MOBILEPROVISION }}
+        P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+      run: |
+        echo "$P12_FILE_BASE64" | base64 --decode > /tmp/my_cert.p12
+        echo "$MOBILEPROVISION_FILE_BASE64" | base64 --decode > /tmp/my_profile.mobileprovision
+        security import /tmp/my_cert.p12 -k ~/Library/Keychains/login.keychain -P "$P12_PASSWORD" -T /usr/bin/codesign
+
+
+    - name: Build and Sign IPA using Fastlane
+      run: |
+        fastlane run gym workspace:"Unity-iPhone.xcworkspace" scheme:"Unity-iPhone" export_method:"ad-hoc" export_xcargs:"-allowProvisioningUpdates" output_directory:"build" output_name:"YourApp.ipa" codesigning_identity:"iPhone Distribution" provisioning_profile_path:"/tmp/my_profile.mobileprovision"
+
+
+    - name: Build IPA
+      run: |
+        xcodebuild archive -workspace Unity-iPhone.xcworkspace -scheme Unity-iPhone -archivePath $PWD/build/Unity-iPhone.xcarchive -allowProvisioningUpdates
+        xcodebuild -exportArchive -archivePath $PWD/build/Unity-iPhone.xcarchive -exportPath $PWD/build/ -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates
+
+    # - name: Build and Sign IPA
+    #   run: |
+    #     xcodebuild archive -workspace YourApp.xcworkspace -scheme YourAppScheme -archivePath $PWD/build/YourApp.xcarchive -allowProvisioningUpdates
+    #     xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportPath $PWD/build/ -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v2
+      with:
+        name: YourApp.ipa
+        path: ${{ github.workspace }}/build/YourApp.ipa

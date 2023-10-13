@@ -25,10 +25,21 @@ jobs:
         echo "FASTLANE_USER=${APPLE_ID}" >> $GITHUB_ENV
         echo "FASTLANE_PASSWORD=${APPLE_PWD}" >> $GITHUB_ENV
 
-    - name: Build and Sign IPA
+    - name: Install CocoaPods
+      run: sudo gem install cocoapods
+
+    - name: Install dependencies using CocoaPods
+      run: pod install --repo-update
+
+    - name: Build IPA
       run: |
-        xcodebuild archive -workspace YourApp.xcworkspace -scheme YourAppScheme -archivePath $PWD/build/YourApp.xcarchive -allowProvisioningUpdates
-        xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportPath $PWD/build/ -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates
+        xcodebuild archive -workspace Unity-iPhone.xcworkspace -scheme Unity-iPhone -archivePath $PWD/build/Unity-iPhone.xcarchive -allowProvisioningUpdates
+        xcodebuild -exportArchive -archivePath $PWD/build/Unity-iPhone.xcarchive -exportPath $PWD/build/ -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates
+
+    # - name: Build and Sign IPA
+    #   run: |
+    #     xcodebuild archive -workspace YourApp.xcworkspace -scheme YourAppScheme -archivePath $PWD/build/YourApp.xcarchive -allowProvisioningUpdates
+    #     xcodebuild -exportArchive -archivePath $PWD/build/YourApp.xcarchive -exportPath $PWD/build/ -exportOptionsPlist ExportOptions.plist -allowProvisioningUpdates
 
     - name: Upload IPA
       uses: actions/upload-artifact@v2

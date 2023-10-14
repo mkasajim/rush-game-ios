@@ -11,12 +11,10 @@ jobs:
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-
+      
     - name: Install Fastlane
       run: |
-        brew install fastlane
-
-
+        sudo xcode-select -s /Applications/Xcode8.app
     
     - uses: akiojin/xcode-build-github-action@v1
       id: xcode-build
@@ -25,8 +23,6 @@ jobs:
         project: Unity-iPhone.xcodeproj
         output-directory: ${{ github.workspace }}/build
         team-id: 'GVHN8HZPLP'
-
-  
 
     - name: Upload IPA
       uses: actions/upload-artifact@v2

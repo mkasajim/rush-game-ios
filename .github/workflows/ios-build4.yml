@@ -21,7 +21,7 @@ jobs:
     - uses: akiojin/xcode-build-github-action@v1
       id: xcode-build
       with:
-        export-method: 'adhoc'
+        export-method: 'ad-hoc'
         project: Unity-iPhone.xcodeproj
         output-directory: ${{ github.workspace }}/build
         team-id: 'GVHN8HZPLP'

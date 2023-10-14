@@ -1,0 +1,35 @@
+name: Build and Sign IOS APP (2)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build and Archive iOS app
+    runs-on: macOS-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Install Fastlane
+      run: |
+        brew install fastlane
+
+
+    
+    - uses: akiojin/xcode-build-github-action@v1
+      id: xcode-build
+      with:
+        export-method: 'adhoc'
+        project: .
+        output-directory: ${{ github.workspace }}/build
+        team-id: 'GVHN8HZPLP'
+
+  
+
+    - name: Upload IPA
+      uses: actions/upload-artifact@v2
+      with:
+        name: YourApp.ipa
+        path: ${{ github.workspace }}/build/YourApp.ipa

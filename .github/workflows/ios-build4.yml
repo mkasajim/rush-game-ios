@@ -12,9 +12,9 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v2
       
-    - name: Select Xcode version
-      run: |
-        sudo xcode-select -s /Applications/Xcode8.app
+    # - name: Select Xcode version
+    #   run: |
+    #     sudo xcode-select -s /Applications/Xcode8.app
     
     - uses: akiojin/xcode-build-github-action@v1
       id: xcode-build

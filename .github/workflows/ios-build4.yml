@@ -22,7 +22,7 @@ jobs:
       id: xcode-build
       with:
         export-method: 'adhoc'
-        project: .
+        project: Unity-iPhone.xcodeproj
         output-directory: ${{ github.workspace }}/build
         team-id: 'GVHN8HZPLP'
 
